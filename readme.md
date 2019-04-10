@@ -81,3 +81,14 @@ WHERE posts.user_created_at >= '2010-01-01'
 ORDER BY posts.created_at DESC
 LIMIT 10;
 ````
+
+### Путь к исходным данным
+````
+/storage/dump.sql
+````
+
+### Путь к оптимизированным данным
+````
+/storage/dump-optimize.sql
+````
+
