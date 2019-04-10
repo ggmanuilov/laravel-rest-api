@@ -101,7 +101,7 @@ class ShortUrlService
      */
     public function getByShortUrl(string $longUrl)
     {
-        $shortUrl = ShortUrls::where('short_url', $longUrl)->select(['id', 'short_url', 'long_url'])->first();
+        $shortUrl = ShortUrls::where('short_url', $longUrl)->select(['id', 'short_url', 'long_url', 'hits'])->first();
         return empty($longUrl) ? false : $shortUrl;
     }
 
@@ -141,5 +141,15 @@ class ShortUrlService
         $shortUrl->short_url = $this->encode($shortUrl->id);
         $shortUrl->save();
         return $shortUrl->only(['id', 'short_url']);
+    }
+
+    /**
+     * Increment hits visits
+     * @param ShortUrls $shortUrl
+     */
+    public function addHit(ShortUrls $shortUrl){
+        ShortUrls::whereId($shortUrl->id)->update([
+            'hits' => $shortUrl->hits + 1
+        ]);
     }
 }

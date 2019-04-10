@@ -29,6 +29,7 @@ class ShortUrlsController extends ApiBaseController
         if (!$shortUrlModel = $this->shortUrlService->getByShortUrl($shortUrl)) {
             return $this->sendResponse('', 404, 'Record not found');
         }
+        $this->shortUrlService->addHit($shortUrlModel);
         return redirect($shortUrlModel->long_url);
     }
 
