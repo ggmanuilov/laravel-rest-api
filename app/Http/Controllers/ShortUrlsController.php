@@ -59,7 +59,7 @@ class ShortUrlsController extends ApiBaseController
             $shortUrlModel = $this->shortUrlService->make($longUrl);
         }
 
-        return $this->sendResponse($shortUrlModel);
+        return $this->sendResponse($shortUrlModel, 201);
     }
 
     /**
