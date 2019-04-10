@@ -58,3 +58,26 @@ create index users_created_at on users (created_at);
 [2019-04-09 22:42:24] 2 rows retrieved starting from 1 in 18 ms (execution: 4 ms, fetching: 14 ms)
 
 Скриптов оптимизации нет в миграции.
+
+### Оптимизация запросов - денормализация
+
+##### 1. добавляем поле - дата регистации пользователя в посты
+```` 
+alter table posts add column user_created_at datetime;
+````
+
+##### 2. заполняем данные о пользователях ( если данных много, нужно делать скрипт )
+````
+update posts
+join users on users.id = posts.user_id
+set posts.user_created_at = users.created_at;
+````
+
+##### 3. переписываем запрос
+````
+SELECT posts.*
+FROM posts
+WHERE posts.user_created_at >= '2010-01-01'
+ORDER BY posts.created_at DESC
+LIMIT 10;
+````
