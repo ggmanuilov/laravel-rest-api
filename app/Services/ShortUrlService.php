@@ -112,7 +112,7 @@ class ShortUrlService
      */
     public function getById(int $id)
     {
-        $shortUrl = ShortUrls::where('id', $id)->select(['id', 'short_url', 'long_url'])->first();
+        $shortUrl = ShortUrls::where('id', $id)->select(['id', 'short_url', 'long_url', 'hits'])->first();
         return empty($id) ? false : $shortUrl;
     }
 

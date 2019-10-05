@@ -2,12 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Api\ApiBaseController;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\ShortUrlRequest;
 use App\Services\ShortUrlService;
 use App\ShortUrls;
 use Illuminate\Http\Request;
 
-class ShortUrlsController extends ApiBaseController
+/**
+ * @group ShortLinks management
+ *
+ * APIs for managing shortLinks
+ */
+class ShortUrlsController extends Controller
 {
     /**
      * @var ShortUrlService
@@ -27,9 +33,10 @@ class ShortUrlsController extends ApiBaseController
     public function resolve($shortUrl)
     {
         if (!$shortUrlModel = $this->shortUrlService->getByShortUrl($shortUrl)) {
-            return $this->sendResponse('', 404, 'Record not found');
+            return response()->json([], 404);
         }
         $this->shortUrlService->addHit($shortUrlModel);
+
         return redirect($shortUrlModel->long_url);
     }
 
@@ -40,27 +47,25 @@ class ShortUrlsController extends ApiBaseController
      */
     public function index()
     {
-        return $this->sendResponse(ShortUrls::all());
+        return response()->json(ShortUrls::all());
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @param ShortUrlRequest $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request)
+    public function store(ShortUrlRequest $request)
     {
         $longUrl = $request->get('long_url');
-
-        $this->shortUrlService->validate(ShortUrlService::METHOD_POST, $request->all());
 
         $shortUrlModel = $this->shortUrlService->getByLongUrl($longUrl);
         if (!$shortUrlModel) {
             $shortUrlModel = $this->shortUrlService->make($longUrl);
         }
 
-        return $this->sendResponse($shortUrlModel, 201);
+        return response()->json($shortUrlModel, 201);
     }
 
     /**
@@ -73,50 +78,53 @@ class ShortUrlsController extends ApiBaseController
     {
         $this->shortUrlService->validate(ShortUrlService::METHOD_GET, ['id' => $id]);
         $shortUrlModel = $this->findModel($id);
-        return $this->sendResponse($shortUrlModel);
+
+        return response()->json($shortUrlModel);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param ShortUrlRequest $request
      * @param \App\ShortUrls $ShortUrls
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(ShortUrlRequest $request)
     {
-        $data = $request->all();
-        $data['id'] = $id;
-
-        $this->shortUrlService->validate(ShortUrlService::METHOD_PUT, $data);
-        $shortUrlModel = $this->shortUrlService->getById($id);
+        $shortUrlModel = $this->shortUrlService->getById($request->get('id'));
         $shortUrlModel->fill($request->except(['id']))
             ->save();
-        return $this->sendResponse($shortUrlModel);
+
+        return response()->json($shortUrlModel);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param Request $request
-     * @param $id
+     * @param ShortUrlRequest $request
      * @return \Illuminate\Http\Response
      * @throws \Exception
+     * @response 204 {}
+     * @response 404 {
+     *  "message": "No query results for model [\App\ShortUrls]"
+     *  }
      */
-    public function destroy(Request $request, $id)
+    public function destroy($id)
     {
         $this->shortUrlService->validate(ShortUrlService::METHOD_DELETE, ['id' => $id]);
 
-        $urlModel = $this->findModel($id);
-        if ($this->shortUrlService->delete($urlModel))
-            return $this->sendResponse($urlModel, 204);
+        $shortUrlModel = $this->findModel($id);
+        if ($this->shortUrlService->delete($shortUrlModel)) {
+            return response()->json($shortUrlModel, 204);
+        }
     }
 
     private function findModel($id)
     {
         if (!$shortUrlModel = $this->shortUrlService->getById($id)) {
-            return $this->sendResponse('', 404, 'Record not found');
+            return response()->json('', 404);
         }
+
         return $shortUrlModel;
     }
 }

@@ -14,5 +14,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::resource('short', 'ShortUrlsController');
+
+Route::group(['prefix' => 'v1/links'], function() {
+    Route::get('/', 'ShortUrlsController@index')->name('links');
+    Route::get('/resolve/{shortUrl}', 'ShortUrlsController@resolve')->name('links.resolve');
+    Route::get('/{linkId}', 'ShortUrlsController@show')->name('links.show');
+    Route::post('/', 'ShortUrlsController@store')->name('links.store');
+
+    Route::put('/{id}', 'ShortUrlsController@update')->name('links.update');
+    Route::delete('/{id}', 'ShortUrlsController@destroy')->name('links.delete');
+});
 

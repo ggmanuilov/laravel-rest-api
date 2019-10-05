@@ -8,8 +8,7 @@ class ShortUrls extends Model
 {
     protected $fillable = ['short_url', 'long_url'];
     protected $appends = ['short'];
-    protected $visible = ['id', 'short', 'long_url'];
-
+    protected $visible = ['id', 'short', 'long_url', 'hits'];
 
     public $timestamps = false;
 

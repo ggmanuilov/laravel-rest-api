@@ -11,13 +11,13 @@
 
 ### API
 
-GET    /api/short   - show all records
+GET    /api/links   - show all records
 
-POST   /api/short   - create item
+POST   /api/links   - create item
 
-PUT    /api/short/:id - update item
+PUT    /api/links/:id - update item
 
-DELETE /api/short/:id - remove item
+DELETE /api/links/:id - remove item
 
 ### WEB
 
